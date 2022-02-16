@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -30,12 +31,20 @@ namespace webapi_usersb2c_clientcredsaad
         {
             // Adds Microsoft Identity platform (AAD v2.0) support to protect this Api
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                    .AddMicrosoftIdentityWebApi(options =>
-                    {
-                        Configuration.Bind("AzureAdB2C", options);
-                        options.TokenValidationParameters.NameClaimType = "name";
-                    },
-                    options => { Configuration.Bind("AzureAdB2C", options); });
+                    .AddMicrosoftIdentityWebApi(Configuration, "AzureAdB2C");
+
+            services.AddAuthentication()
+                    .AddMicrosoftIdentityWebApi(Configuration, "AzureAd", "AzureAdScheme");
+
+            services.AddAuthorization(options =>
+            {
+                options.DefaultPolicy = new AuthorizationPolicyBuilder(
+                    JwtBearerDefaults.AuthenticationScheme,
+                    "AzureAdScheme")
+                    .RequireAuthenticatedUser()
+                    .Build();
+            });
+
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
