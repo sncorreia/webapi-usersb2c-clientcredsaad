@@ -6,6 +6,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
+
+// We can define the auth scheme that the controller can accept:
+// [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+
 namespace webapi_usersb2c_clientcredsaad.Controllers
 {
     [Authorize]
